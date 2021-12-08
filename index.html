@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/web3@latest/dist/web3.min.js"></script>
+    <script type="text/javascript" src="./script.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="sideBar">
+        <div class="aboutGame">
+            <div id="contractText"></div>
+            <button id="player1Button">Player 1</button>
+            <div id="player1Text"></div>
+            <button id="player2Button">Player 2</button>
+            <div id="player2Text"></div>
+        </div>
+    </div>
+    <div class="board" id="board">
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+        <div class="cell" data-cell></div>
+    </div>
+    <div class="winning-message" id="winningMessage">
+        <div data-winning-message-text></div>
+    </div>
+    <script>
+        const X_CLASS = 'x';
+        const CIRCLE_CLASS = 'circle';
+        const WINNING_COMBINATIONS = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+        const cellElements = document.querySelectorAll('[data-cell]');
+        const winningMessageElement = document.getElementById('winningMessage');
+        const winningMessageTextElement = document.querySelector('[data-winning-message-text]');
+
+        const player1Button = document.getElementById("player1Button");
+        player1Button.onclick = async function () {
+            document.getElementById("player1Text").innerText = await contract.methods.player1Address().call();;
+        }
+
+        const player2Button = document.getElementById("player2Button");
+        player2Button.onclick = async function () {
+            document.getElementById("player2Text").innerText = await contract.methods.player2Address().call();;
+        }
+
+        var address = "0x9B20E2fc3f111394A40cb818dF236D53146afa0E";
+        var abi = [
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "_player2",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "_stakes",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "inputs": [],
+                "name": "currentPlayerAddress",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "isGameOver",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "name": "isPaid",
+                "outputs": [
+                    {
+                        "internalType": "bool",
+                        "name": "",
+                        "type": "bool"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {
+                        "internalType": "uint8",
+                        "name": "cellID",
+                        "type": "uint8"
+                    }
+                ],
+                "name": "performMove",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "player1",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "player1Address",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "player2",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "player2Address",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "prizePool",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "rowToString",
+                "outputs": [
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "stakes",
+                "outputs": [
+                    {
+                        "internalType": "uint256",
+                        "name": "",
+                        "type": "uint256"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "winner",
+                "outputs": [
+                    {
+                        "internalType": "address",
+                        "name": "",
+                        "type": "address"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "withdraw",
+                "outputs": [],
+                "stateMutability": "payable",
+                "type": "function"
+            },
+            {
+                "stateMutability": "payable",
+                "type": "receive"
+            }
+        ];
+
+        var contract;
+        let circleTurn;
+
+        document.addEventListener("DOMContentLoaded", function (event) {
+            web3 = new Web3(window.ethereum);
+            contract = new web3.eth.Contract(abi, address);
+        });
+
+        document.getElementById('contractText').innerText = "Adresiukas: " + address;
+
+        startGame();
+
+        function startGame() {
+            circleTurn = false;
+            cellElements.forEach((cell, index) => {
+                cell.addEventListener('click', handleClick, { once: true })
+                cell.index = index;
+            })
+        }
+
+        async function handleClick(e) {
+            const account = await getAccount();
+            const isPaid = await contract.methods.isPaid(account).call();
+            console.log(isPaid);
+            if (!isPaid) {
+                return alert("mokek");
+            }
+            const cell = e.target;
+            const cellIndex = cell.index;
+            const currentClass = circleTurn ? CIRCLE_CLASS : X_CLASS
+            contract.methods.performMove(cellIndex).send({ from: account }).on('transactionHash', (hash) => {
+                placeMark(cell, currentClass);
+                if (checkWin(currentClass)) {
+                    endGame(false);
+                } else if (isDraw()) {
+                    endGame(true);
+                } else {
+                    swapTurns();
+                }
+
+            }).on("error", function () {
+                console.log("Rejected");
+            })
+        }
+
+        async function endGame(draw) {
+            if (draw) {
+                winningMessageTextElement.innerText = 'Draw!';
+            } else {
+                winningMessageTextElement.innerText = `${circleTurn ? "First" : "Second"} Player Won!`;
+            }
+            winningMessageElement.classList.add('show');
+
+            const account = await getAccount();
+            contract.methods.withdraw().send({ from: account }).on('transactionHash', (hash) => {
+                alert("saibos pervestos");
+
+            }).on("error", function () {
+                console.log("Rejected");
+            })
+        }
+
+        async function getAccount() {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            return accounts[0];
+        }
+
+        function placeMark(cell, currentClass) {
+            cell.classList.add(currentClass);
+        }
+
+        function swapTurns() {
+            circleTurn = !circleTurn;
+        }
+
+        function isDraw() {
+            return [...cellElements].every(cell => {
+                return cell.classList.contains(X_CLASS) || cell.classList.contains(CIRCLE_CLASS)
+            })
+        }
+
+        function checkWin(currentClass) {
+            return WINNING_COMBINATIONS.some(combination => {   //grazina true, jeigu combinations praeina pro visus variantus ir yra teisingai
+                return combination.every(index => {
+                    return cellElements[index].classList.contains(currentClass)
+                })
+            })
+        }
+    </script>
+    <style>
+        * {
+        /* *::before,
+        *::after { */
+            box-sizing: border-box;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        :root {
+            --cell-size: 100px;
+            --mark-size: calc(var(--cell-size) * 0.9);
+        }
+
+        div {
+            display: block;
+        }
+
+        .sideBar {
+            display: flex;
+            flex-direction: column;
+            height: auto;
+            width: 200px;
+            position: fixed;
+            left: 0;
+            margin-top: 20px;
+            margin-left: 20px;
+        }
+
+        button {
+            border: none;
+            padding: 20px 50px;
+            background-color: rgb(209, 57, 82);
+            text-transform: uppercase;
+            border-radius: 20px;
+            color: white;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        button:hover {
+           background-color: tomato;
+
+        }
+
+        .board {
+            display: grid;
+            width: 100vw;
+            height: 100vh;
+            justify-content: center;
+            align-content: center;
+            grid-template-columns: repeat(3, auto);
+            justify-items: center;
+            align-items: center;
+            margin: 40px auto 0px auto;
+        }
+
+        .cell {
+            width: var(--cell-size);
+            height: var(--cell-size);
+            border: 1px solid black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .cell:first-child,
+        .cell:nth-child(2),
+        .cell:nth-child(3) {
+            border-top: none;
+        }
+
+        .cell:nth-child(3n + 1) {
+            border-left: none;
+        }
+
+        .cell:nth-child(3n + 3) {
+            border-right: none;
+        }
+
+        .cell:nth-child(7),
+        .cell:nth-child(8),
+        .cell:nth-child(9) {
+            border-bottom: none;
+        }
+
+        .cell.x,
+        .cell.circle {
+            cursor: not-allowed;
+        }
+
+        .cell.x::before,
+        .cell.x::after {
+            content: '';
+            position: absolute;
+            width: calc(var(--mark-size) * 0.15);
+            height: var(--mark-size);
+            background-color: black;
+        }
+
+        .cell.x::before {
+            transform: rotate(45deg);
+        }
+
+        .cell.x::after {
+            transform: rotate(-45deg);
+        }
+
+        .cell.circle::before,
+        .cell.circle::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+        }
+
+        .cell.circle::before {
+            width: var(--mark-size);
+            height: var(--mark-size);
+            background-color: black;
+        }
+
+        .cell.circle::after {
+            width: calc(var(--mark-size) * .7);
+            height: calc(var(--mark-size) * .7);
+            background-color: white;
+        }
+
+        .winning-message {
+            display: none;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, .75);
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 5rem;
+            z-index: 2;
+        }
+
+        .winning-message.show {
+            display: flex;
+        }
+    </style>
+</body>
+
+</html>
