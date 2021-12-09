@@ -73,13 +73,13 @@ contract TicTacToe {
     }
 
     function performMove(uint8 cellID) public {
-        // require(isPaid[msg.sender] == true, "pay the price");
-        // require(msg.sender == player1 || msg.sender == player2);
-        // require(!isGameOver());
-        // require(msg.sender == currentPlayerAddress());
+        require(isPaid[msg.sender] == true, "pay the price");
+        require(msg.sender == player1 || msg.sender == player2);
+        require(!isGameOver());
+        require(msg.sender == currentPlayerAddress());
 
-        // require(positionIsInBounds(cellID), "Choose valid cell number");
-        // require(board[cellID] == CellState.Empty);
+        require(positionIsInBounds(cellID), "Choose valid cell number");
+        require(board[cellID] == CellState.Empty);
 
         board[cellID] = currentPlayerShape();
         current_move = current_move + 1;
